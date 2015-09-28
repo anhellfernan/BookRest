@@ -13,8 +13,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     })
 
     router.post("/newusu",function(req,res){
-        var query = "INSERT INTO ??(??,??,??) VALUES (?,?,?)";
-        var table = ["usuarios","usuario","password","nombre",req.body.usuario,md5(req.body.password),req.body.nombre];
+        var query = "INSERT INTO ??(??,??,??,??) VALUES (?,?,?,?)";
+        var table = ["usuarios","usuario","password","nombre","telefono",req.body.usuario,req.body.password,req.body.nombre,req.body.telefono];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
@@ -40,7 +40,20 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
 
     router.get("/getusu/:usuario/:password",function(req,res){
         var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
-        var table = ["usuarios","usuario",req.params.usuario,"password", md5(req.params.password)];
+        var table = ["usuarios","usuario",req.params.usuario,"password", req.params.password];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Mensaje" : "Error ejecutando MySQL query"});
+            } else {
+                res.json({"Error" : false, "Mensaje" : "Success", "usuarios" : rows});
+            }
+        });
+    });
+
+    router.get("/getpass/:usuario/",function(req,res){
+        var query = "SELECT * FROM ?? WHERE ??=?";
+        var table = ["usuarios","usuario",req.params.usuario];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
@@ -65,7 +78,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     });
 
         router.get("/delofe/:isbn",function(req,res){
-        var query = "SELECT * FROM ?? WHERE ??=?";
+        var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["ofertas","isbn",req.params.isbn];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
@@ -73,6 +86,19 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                 res.json({"Error" : true, "Mensaje" : "Error ejecutando MySQL query"});
             } else {
                 res.json({"Error" : false, "Mensaje" : "Success", "usuarios" : rows});
+            }
+        });
+    });
+
+    router.get("/getofe/:email",function(req,res){
+        var query = "SELECT * FROM ?? WHERE ??=?";
+        var table = ["ofertas","email",req.params.email];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error ejecutando MySQL query"});
+            } else {
+                res.json({"Error" : false, "Message" : "Success", "Oferta" : rows});
             }
         });
     });
